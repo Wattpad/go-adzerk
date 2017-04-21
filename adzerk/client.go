@@ -24,22 +24,34 @@ type Client struct {
 	URL    string
 }
 
+// A RequestData is a parameter object which should be created and populated
+// when generating a new Adzerk request using NewRequest.
+type RequestData struct {
+	IP               string
+	UserID           string
+	BlockedCreatives []int
+	Keywords         []string
+	Placements       []Placement
+}
+
 // A Request defines the JSON layout of the request body being sent to Adzerk.
 type Request struct {
-	IP         string      `json:"ip"`
-	Time       int64       `json:"time"`
-	Keywords   []string    `json:"keywords"`
-	User       User        `json:"user"`
-	Placements []Placement `json:"placements"`
+	IP               string      `json:"ip"`
+	Time             int64       `json:"time"`
+	Keywords         []string    `json:"keywords"`
+	User             User        `json:"user"`
+	Placements       []Placement `json:"placements"`
+	BlockedCreatives []int       `json:"blockedCreatives"`
 }
 
 // A Placement defines the JSON layout of the `placements` object in the request body.
 type Placement struct {
-	NetworkID int    `json:"networkId"`
-	SiteID    int    `json:"siteId"`
-	DivName   string `json:"divName"`
-	ZoneIDs   []int  `json:"zoneIds"`
-	AdTypes   []int  `json:"adTypes"`
+	NetworkID  int         `json:"networkId"`
+	SiteID     int         `json:"siteId"`
+	DivName    string      `json:"divName"`
+	ZoneIDs    []int       `json:"zoneIds"`
+	AdTypes    []int       `json:"adTypes"`
+	Properties interface{} `json:"properties"`
 }
 
 // A User defines the JSON layout of the `user` object in the request body.
@@ -84,24 +96,17 @@ func (c *Client) Do(ctx context.Context, req *http.Request, v interface{}) (*htt
 }
 
 // NewRequest creates a new POST API request.
-func (c *Client) NewRequest(networkID, siteID int, divName, IP, userID string, zoneIDs, adTypes []int, keywords []string) (*http.Request, error) {
+func (c *Client) NewRequest(data RequestData) (*http.Request, error) {
 	var buf io.ReadWriter
 	body := Request{
-		IP:       IP,
+		IP:       data.IP,
 		Time:     time.Now().Unix(),
-		Keywords: keywords,
+		Keywords: data.Keywords,
 		User: User{
-			Key: userID,
+			Key: data.UserID,
 		},
-		Placements: []Placement{
-			{
-				NetworkID: networkID,
-				SiteID:    siteID,
-				DivName:   divName,
-				ZoneIDs:   zoneIDs,
-				AdTypes:   adTypes,
-			},
-		},
+		Placements:       data.Placements,
+		BlockedCreatives: data.BlockedCreatives,
 	}
 
 	buf = new(bytes.Buffer)
