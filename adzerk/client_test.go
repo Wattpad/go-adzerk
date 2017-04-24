@@ -59,16 +59,9 @@ func runTestDo(t *testing.T, tc testCase) {
 
 	c := NewClient(nil)
 	c.URL = ts.URL
-	req, err := c.NewRequest(
-		0,
-		0,
-		"a",
-		tc.IP,
-		"a",
-		[]int{1, 2},
-		[]int{3, 4},
-		[]string{"b"},
-	)
+	req, err := c.NewRequest(RequestData{
+		IP: tc.IP,
+	})
 	if err != nil {
 		t.Errorf("Expected nil err from NewRequest, got %s", err)
 	}
