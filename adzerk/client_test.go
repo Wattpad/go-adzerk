@@ -41,7 +41,7 @@ func runTestDo(t *testing.T, tc testCase) {
 
 		reqBody, err := ioutil.ReadAll(r.Body)
 		if err != nil {
-			t.Errorf("Expected nil err, got %s", err.Error())
+			t.Errorf("Expected nil err from ioutil.ReadAll, got %s", err.Error())
 		}
 
 		var actualReq Request
@@ -59,8 +59,17 @@ func runTestDo(t *testing.T, tc testCase) {
 
 	c := NewClient(nil)
 	c.URL = ts.URL
+	placements := []Placement{
+		{
+			NetworkID: 123,
+			SiteID:    456,
+			AdTypes:   []int{789},
+			DivName:   "foo",
+		},
+	}
 	req, err := c.NewRequest(RequestData{
-		IP: tc.IP,
+		IP:         tc.IP,
+		Placements: placements,
 	})
 	if err != nil {
 		t.Errorf("Expected nil err from NewRequest, got %s", err)
@@ -75,5 +84,53 @@ func runTestDo(t *testing.T, tc testCase) {
 	}
 	if response.StatusCode != http.StatusOK {
 		t.Errorf("Expected status %d, got %d", http.StatusOK, response.StatusCode)
+	}
+}
+
+func TestNewRequest(t *testing.T) {
+	c := NewClient(nil)
+	placements := []Placement{
+		{
+			NetworkID: 123,
+			SiteID:    456,
+			AdTypes:   []int{789},
+			DivName:   "foo",
+		},
+	}
+	data := RequestData{
+		Placements:         placements,
+		IncludePricingData: true,
+	}
+	httpReq, err := c.NewRequest(data)
+
+	if err != nil {
+		t.Errorf("Expected nil err from NewRequest, got %s", err)
+	}
+
+	reqBody, err := ioutil.ReadAll(httpReq.Body)
+	if err != nil {
+		t.Errorf("Expected nil err from ioutil.ReadAll, got %s", err.Error())
+	}
+
+	var processedReq Request
+	err = json.Unmarshal(reqBody, &processedReq)
+	if err != nil {
+		t.Errorf("Expected nil json unmarshal err, instead got %s", err)
+	}
+
+	if processedReq.IncludePricingData != data.IncludePricingData {
+		t.Errorf("Expected IncludePricingData: %t, got %t", data.IncludePricingData, processedReq.IncludePricingData)
+	}
+}
+
+func TestNewRequestNoPlacements(t *testing.T) {
+	c := NewClient(nil)
+
+	_, err := c.NewRequest(RequestData{
+		IsMobile: true,
+	})
+
+	if err != ErrNoPlacements {
+		t.Errorf("Expected ErrNoPlacements, got %s", err)
 	}
 }
