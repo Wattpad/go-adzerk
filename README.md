@@ -1,7 +1,9 @@
 # go-adzerk
 go-adzerk is a Go client library for accessing [Adzerk's Native Ads API](http://dev.adzerk.com/reference#native-ads-api-overview).
 
-**Build Status:** [![Build Status](https://travis-ci.org/Wattpad/go-adzerk.svg?branch=master)](https://travis-ci.org/Wattpad/go-adzerk)
+[![GoDoc](https://godoc.org/github.com/Wattpad/go-adzerk/adzerk?status.svg)](https://godoc.org/github.com/Wattpad/go-adzerk/adzerk)
+[![Build Status](https://travis-ci.org/Wattpad/go-adzerk.svg?branch=master)](https://travis-ci.org/Wattpad/go-adzerk)
+[![Coverage Status](https://coveralls.io/repos/github/Wattpad/go-adzerk/badge.svg?branch=master)](https://coveralls.io/github/Wattpad/go-adzerk?branch=master)
 
 ## Usage
 ```go
