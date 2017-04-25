@@ -50,3 +50,7 @@ Modifying the URL which the client will hit – for example, when creating mock 
 ```go
 client.URL = "http://mockserveraddress.com"
 ```
+
+## License
+
+This library is distributed under the MIT-style license found in the [LICENSE](./LICENSE) file.
